@@ -74,6 +74,7 @@ struct InstructionsScreen: View {
         return InstructionCardView(
             item: item,
             photos: photos,
+            instructionRules: model.instructionRules,
             onInstructions: { model.setInstructions(stopID: item.id, text: $0) },
             onClear: { model.clearInstructions(stopID: item.id) },
             onRemove: { model.removeFromRoute(stopID: item.id) },
@@ -225,6 +226,7 @@ private struct CardFocusKey: PreferenceKey {
 private struct InstructionCardView: View {
     let item: SelectedStop
     let photos: [DeliveryPhoto]?
+    let instructionRules: InstructionRules
     let onInstructions: (String) -> Void
     let onClear: () -> Void
     let onRemove: () -> Void
@@ -324,7 +326,7 @@ private struct InstructionCardView: View {
             }
 
             HStack {
-                Text("\(item.instructions.count)/\(InstructionRules.maxCharacters)")
+                Text("\(item.instructions.count)/\(instructionRules.maxCharacters)")
                     .font(.system(size: 12, design: .monospaced))
                     .foregroundStyle(Theme.muted)
                 Spacer()

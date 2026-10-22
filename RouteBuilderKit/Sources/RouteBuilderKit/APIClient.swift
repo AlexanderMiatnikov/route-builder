@@ -13,6 +13,9 @@ public struct APIClient: Dispatching {
     private let baseURL: URL
     private let session: URLSession
     private let sleep: Sleep
+    private let stopPages = StopPageParser()
+    private let photos = PhotoParser()
+    private let routes = RouteResponseParser()
 
     public init(
         baseURL: URL,
@@ -42,7 +45,7 @@ public struct APIClient: Dispatching {
         components.queryItems = queryItems
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
-        return try await perform(request, parse: StopPageParser.page)
+        return try await perform(request, parse: stopPages.page)
     }
 
     public func fetchPhotos(stopID: String) async throws -> [DeliveryPhoto] {
@@ -52,7 +55,7 @@ public struct APIClient: Dispatching {
                 .appendingPathComponent("photos")
         )
         request.httpMethod = "GET"
-        return try await perform(request, parse: PhotoParser.photos)
+        return try await perform(request, parse: photos.photos)
     }
 
     public func createRoute(stops: [RouteStopPayload]) async throws -> CreatedRoute {
@@ -61,7 +64,7 @@ public struct APIClient: Dispatching {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try encode(Body(stops: stops))
-        return try await perform(request, parse: RouteResponseParser.created)
+        return try await perform(request, parse: routes.created)
     }
 
     public func notify(
@@ -82,7 +85,7 @@ public struct APIClient: Dispatching {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(idempotencyKey, forHTTPHeaderField: "Idempotency-Key")
         request.httpBody = try encode(Body(stopID: stopID))
-        return try await perform(request, parse: RouteResponseParser.notify)
+        return try await perform(request, parse: routes.notify)
     }
 
     private func endpoint(_ component: String) -> URL {
@@ -131,7 +134,7 @@ public struct APIClient: Dispatching {
             }
             throw APIError.server(
                 status: http.statusCode,
-                code: RouteResponseParser.errorCode(from: data)
+                code: routes.errorCode(from: data)
             )
         }
     }

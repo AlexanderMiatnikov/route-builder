@@ -1,5 +1,7 @@
-public enum PageMerge {
-    public static func merge(
+public struct PageMerge: Sendable {
+    public init() {}
+
+    public func merge(
         existing: [Stop],
         page: StopPage
     ) -> (items: [Stop], added: Int) {
@@ -16,6 +18,7 @@ public enum PageMerge {
 
 public struct DirectoryLoader: Sendable {
     private let api: any Dispatching
+    private let pageMerge = PageMerge()
 
     public init(api: any Dispatching) {
         self.api = api
@@ -31,7 +34,7 @@ public struct DirectoryLoader: Sendable {
                 pageSize: pageSize,
                 query: query
             )
-            let merged = PageMerge.merge(existing: items, page: page)
+            let merged = pageMerge.merge(existing: items, page: page)
             items = merged.items
 
             guard page.hasMore, merged.added > 0 else { return items }

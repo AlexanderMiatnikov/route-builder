@@ -2,6 +2,8 @@ import XCTest
 @testable import RouteBuilderKit
 
 final class ParsingTests: XCTestCase {
+    private let initials = Initials()
+
     func testPackagesMax_number_string_null() throws {
         let data = """
         {"items":[
@@ -10,7 +12,7 @@ final class ParsingTests: XCTestCase {
           {"id":"c","name":"C","address":"1","phone":"1","packages_max":null}
         ],"page":1,"page_size":10,"has_more":false}
         """.data(using: .utf8)!
-        let page = try StopPageParser.page(from: data)
+        let page = try StopPageParser().page(from: data)
         XCTAssertEqual(page.items[0].packagesMax, 5)
         XCTAssertEqual(page.items[1].packagesMax, 7)
         XCTAssertNil(page.items[2].packagesMax)
@@ -18,7 +20,7 @@ final class ParsingTests: XCTestCase {
 
     func testNullItemsIsEmptyList() throws {
         let data = #"{"items":null,"page":1,"page_size":10,"has_more":false}"#.data(using: .utf8)!
-        XCTAssertEqual(try StopPageParser.page(from: data).items, [])
+        XCTAssertEqual(try StopPageParser().page(from: data).items, [])
     }
 
     func testSkipsMalformedRow() throws {
@@ -26,7 +28,7 @@ final class ParsingTests: XCTestCase {
         {"items":[null,{"id":"ok","name":"Ok","address":"x","phone":"y"}],
          "page":1,"page_size":10,"has_more":false}
         """.data(using: .utf8)!
-        XCTAssertEqual(try StopPageParser.page(from: data).items.map(\.id), ["ok"])
+        XCTAssertEqual(try StopPageParser().page(from: data).items.map(\.id), ["ok"])
     }
 
     func testDates_isoZ_isoNoZ_unix() throws {
@@ -37,7 +39,7 @@ final class ParsingTests: XCTestCase {
           {"id":"c","name":"C","address":"1","phone":"1","last_delivery_at":1694176009}
         ],"page":1,"page_size":10,"has_more":false}
         """.data(using: .utf8)!
-        let page = try StopPageParser.page(from: data)
+        let page = try StopPageParser().page(from: data)
         XCTAssertNotNil(page.items[0].lastDeliveryAt)
         XCTAssertNotNil(page.items[1].lastDeliveryAt)
         XCTAssertNotNil(page.items[2].lastDeliveryAt)
@@ -52,16 +54,16 @@ final class ParsingTests: XCTestCase {
           {"id":"p1","url":null,"tag":"parking"}
         ]}
         """.data(using: .utf8)!
-        XCTAssertEqual(try PhotoParser.photos(from: data).map(\.id), ["p0"])
+        XCTAssertEqual(try PhotoParser().photos(from: data).map(\.id), ["p0"])
     }
 
     func testInitials() {
-        XCTAssertEqual(Initials.make(from: "Sova Studio Gallery"), "SG")
-        XCTAssertEqual(Initials.make(from: "Pilates 9 Studio"), "P9")
-        XCTAssertEqual(Initials.make(from: "The Little Zoo"), "LZ")
-        XCTAssertEqual(Initials.make(from: "Roma Pizza — Central Bus Station branch"), "RP")
-        XCTAssertEqual(Initials.make(from: "24/7 Pharmacy"), "2P")
-        XCTAssertEqual(Initials.sectionLetter(name: "24/7 Pharmacy"), "#")
+        XCTAssertEqual(initials.make(from: "Sova Studio Gallery"), "SG")
+        XCTAssertEqual(initials.make(from: "Pilates 9 Studio"), "P9")
+        XCTAssertEqual(initials.make(from: "The Little Zoo"), "LZ")
+        XCTAssertEqual(initials.make(from: "Roma Pizza — Central Bus Station branch"), "RP")
+        XCTAssertEqual(initials.make(from: "24/7 Pharmacy"), "2P")
+        XCTAssertEqual(initials.sectionLetter(name: "24/7 Pharmacy"), "#")
     }
 
     func testStopGroupingSections() {
@@ -70,7 +72,7 @@ final class ParsingTests: XCTestCase {
             Stop(id: "2", name: "24/7 Pharmacy", address: "2", phone: "2"),
             Stop(id: "3", name: "Alpha Bakery", address: "3", phone: "3")
         ]
-        let sections = StopGrouping.sections(stops)
+        let sections = StopGrouping().sections(stops)
         XCTAssertEqual(sections.map(\.letter), ["#", "A", "S"])
         XCTAssertEqual(sections[0].stops.map(\.id), ["2"])
         XCTAssertEqual(sections[1].stops.map(\.id), ["3"])
@@ -78,12 +80,24 @@ final class ParsingTests: XCTestCase {
     }
 
     func testClampAndInstructionCap() {
-        XCTAssertEqual(PackageCount.clamp(0, max: 5), 1)
-        XCTAssertEqual(PackageCount.clamp(99, max: nil), 9)
-        XCTAssertEqual(InstructionRules.maxCharacters, 200)
-        XCTAssertTrue(InstructionRules.isEmpty("  \n"))
+        XCTAssertEqual(PackageCount().clamp(0, max: 5), 1)
+        XCTAssertEqual(PackageCount().clamp(99, max: nil), 9)
+        XCTAssertEqual(InstructionRules().maxCharacters, 200)
+        XCTAssertTrue(InstructionRules().isEmpty("  \n"))
         let long = String(repeating: "a", count: 250)
         XCTAssertEqual(RouteStopPayload(stopID: "x", packages: 0, instructions: long).normalized().instructions.count, 200)
         XCTAssertEqual(RouteStopPayload(stopID: "x", packages: 0, instructions: "hi").normalized().packages, 1)
+    }
+
+    func testInjectedRulesOverrideDefaults() {
+        let rules = InstructionRules(maxCharacters: 5)
+        XCTAssertEqual(rules.clip("abcdefgh"), "abcde")
+        XCTAssertEqual(
+            RouteStopPayload(stopID: "x", packages: 1, instructions: "abcdefgh").normalized(rules: rules).instructions,
+            "abcde"
+        )
+        let counts = PackageCount(fallbackMax: 3)
+        XCTAssertEqual(counts.clamp(99, max: nil), 3)
+        XCTAssertEqual(counts.upperBound(max: 7), 7)
     }
 }

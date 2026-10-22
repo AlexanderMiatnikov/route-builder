@@ -85,11 +85,11 @@ public struct RouteStopPayload: Equatable, Sendable, Codable {
         self.instructions = instructions
     }
 
-    public func normalized() -> RouteStopPayload {
+    public func normalized(rules: InstructionRules = InstructionRules()) -> RouteStopPayload {
         RouteStopPayload(
             stopID: stopID,
             packages: max(1, packages),
-            instructions: String(instructions.prefix(InstructionRules.maxCharacters))
+            instructions: rules.clip(instructions)
         )
     }
 
@@ -175,26 +175,41 @@ public enum APIError: Error, Equatable, Sendable {
     }
 }
 
-public enum InstructionRules {
+public struct InstructionRules: Sendable {
     /// The mock stores `instructions.slice(0, 200)` even though the doc says 250.
-    public static let maxCharacters = 200
+    public static let defaultMaxCharacters = 200
 
-    public static func isEmpty(_ text: String) -> Bool {
+    public let maxCharacters: Int
+
+    public init(maxCharacters: Int = InstructionRules.defaultMaxCharacters) {
+        self.maxCharacters = maxCharacters
+    }
+
+    public func isEmpty(_ text: String) -> Bool {
         text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    public func clip(_ text: String) -> String {
+        String(text.prefix(maxCharacters))
     }
 }
 
-public enum PackageCount {
+public struct PackageCount: Sendable {
     /// Used when the service sends `packages_max: null`.
-    public static let fallbackMax = 9
+    public static let defaultFallbackMax = 9
 
-    public static func clamp(_ value: Int, max declared: Int?) -> Int {
-        let upper: Int
-        if let declared, declared >= 1 {
-            upper = declared
-        } else {
-            upper = fallbackMax
-        }
-        return min(upper, max(1, value))
+    public let fallbackMax: Int
+
+    public init(fallbackMax: Int = PackageCount.defaultFallbackMax) {
+        self.fallbackMax = fallbackMax
+    }
+
+    public func upperBound(max declared: Int?) -> Int {
+        if let declared, declared >= 1 { return declared }
+        return fallbackMax
+    }
+
+    public func clamp(_ value: Int, max declared: Int?) -> Int {
+        min(upperBound(max: declared), max(1, value))
     }
 }

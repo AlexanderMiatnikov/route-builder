@@ -60,22 +60,39 @@ final class DispatcherModel {
     var undo: UndoToken?
     var photosByStop: [String: [DeliveryPhoto]] = [:]
 
+    let initials: Initials
+    let packageCount: PackageCount
+    let instructionRules: InstructionRules
+
     private let api: any Dispatching
     private let loader: DirectoryLoader
     private let gateway: RouteGateway
     private let draftStore: DraftStore
+    private let search: StopSearch
+    private let grouping: StopGrouping
     private var searchTask: Task<Void, Never>?
     private var undoTask: Task<Void, Never>?
 
     init(
-        api: (any Dispatching)? = nil,
-        draftStore: DraftStore = DraftStore()
+        api: any Dispatching,
+        loader: DirectoryLoader,
+        gateway: RouteGateway,
+        draftStore: DraftStore,
+        search: StopSearch,
+        grouping: StopGrouping,
+        initials: Initials,
+        instructionRules: InstructionRules,
+        packageCount: PackageCount
     ) {
-        let client = api ?? APIClient(baseURL: APIConfig.baseURL)
-        self.api = client
-        self.loader = DirectoryLoader(api: client)
-        self.gateway = RouteGateway(api: client)
+        self.api = api
+        self.loader = loader
+        self.gateway = gateway
         self.draftStore = draftStore
+        self.search = search
+        self.grouping = grouping
+        self.initials = initials
+        self.instructionRules = instructionRules
+        self.packageCount = packageCount
         if let draft = draftStore.load() {
             apply(draft: draft)
         }
@@ -87,7 +104,7 @@ final class DispatcherModel {
     }
 
     var sections: [StopSection] {
-        StopGrouping.sections(displayedStops)
+        grouping.sections(displayedStops)
     }
 
     var isSearchingActive: Bool {
@@ -140,7 +157,7 @@ final class DispatcherModel {
         isSearching = true
         // Instant, case-insensitive answer from the loaded directory; the API
         // (case-sensitive) result is merged in after the debounce.
-        searchResults = StopSearch.filter(directory, query: trimmed)
+        searchResults = search.filter(directory, query: trimmed)
         searchTask = Task {
             try? await Task.sleep(nanoseconds: 280_000_000)
             guard !Task.isCancelled else { return }
@@ -151,9 +168,9 @@ final class DispatcherModel {
                 server = []
             }
             guard !Task.isCancelled else { return }
-            searchResults = StopSearch.combine(
+            searchResults = search.combine(
                 server: server,
-                local: StopSearch.filter(directory, query: trimmed)
+                local: search.filter(directory, query: trimmed)
             )
             isSearching = false
         }
@@ -192,7 +209,7 @@ final class DispatcherModel {
     func setPackages(stopID: String, value: Int) {
         guard let index = selected.firstIndex(where: { $0.id == stopID }) else { return }
         let maxAllowed = selected[index].stop.packagesMax
-        selected[index].packages = PackageCount.clamp(value, max: maxAllowed)
+        selected[index].packages = packageCount.clamp(value, max: maxAllowed)
         persist()
     }
 
@@ -230,9 +247,9 @@ final class DispatcherModel {
 
     func setInstructions(stopID: String, text: String) {
         guard let index = selected.firstIndex(where: { $0.id == stopID }) else { return }
-        let clipped = String(text.prefix(InstructionRules.maxCharacters))
+        let clipped = instructionRules.clip(text)
         selected[index].instructions = clipped
-        if !InstructionRules.isEmpty(clipped) {
+        if !instructionRules.isEmpty(clipped) {
             selected[index].showInstructionError = false
         }
         persist()
@@ -290,7 +307,7 @@ final class DispatcherModel {
     func validateInstructions() -> String? {
         var firstBad: String?
         for index in selected.indices {
-            if InstructionRules.isEmpty(selected[index].instructions) {
+            if instructionRules.isEmpty(selected[index].instructions) {
                 selected[index].showInstructionError = true
                 if firstBad == nil { firstBad = selected[index].id }
             } else {
@@ -362,8 +379,8 @@ final class DispatcherModel {
         selected = draft.stops.map {
             SelectedStop(
                 stop: $0.stop,
-                packages: PackageCount.clamp($0.packages, max: $0.stop.packagesMax),
-                instructions: String($0.instructions.prefix(InstructionRules.maxCharacters)),
+                packages: packageCount.clamp($0.packages, max: $0.stop.packagesMax),
+                instructions: instructionRules.clip($0.instructions),
                 photoPath: $0.photoPath
             )
         }

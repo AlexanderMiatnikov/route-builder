@@ -2,17 +2,19 @@ import Foundation
 
 public actor RouteGateway {
     private let api: any Dispatching
+    private let rules: InstructionRules
     private var inFlight: Task<CreatedRoute, Error>?
 
-    public init(api: any Dispatching) {
+    public init(api: any Dispatching, rules: InstructionRules = InstructionRules()) {
         self.api = api
+        self.rules = rules
     }
 
     public func submit(_ stops: [RouteStopPayload]) async throws -> CreatedRoute {
         if let inFlight {
             return try await inFlight.value
         }
-        let normalized = stops.map { $0.normalized() }
+        let normalized = stops.map { $0.normalized(rules: rules) }
         let task = Task { try await api.createRoute(stops: normalized) }
         inFlight = task
         defer { inFlight = nil }

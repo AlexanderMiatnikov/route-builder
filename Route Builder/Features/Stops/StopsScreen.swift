@@ -211,7 +211,7 @@ struct StopsScreen: View {
         } label: {
             HStack(spacing: 12) {
                 checkbox(selected: selected)
-                Text(Initials.make(from: stop.name))
+                Text(model.initials.make(from: stop.name))
                     .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(Theme.ink)
                     .frame(width: 40, height: 40)
@@ -251,6 +251,7 @@ struct StopsScreen: View {
                         QuantityPopover(
                             current: model.packages(for: stop),
                             maxPackages: stop.packagesMax,
+                            packageCount: model.packageCount,
                             onSave: { value in
                                 model.setPackages(stopID: stop.id, value: value)
                                 quantityStop = nil

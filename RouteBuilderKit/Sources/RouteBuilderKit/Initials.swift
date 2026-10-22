@@ -1,7 +1,9 @@
 import Foundation
 
-public enum Initials {
-    public static func make(from name: String) -> String {
+public struct Initials: Sendable {
+    public init() {}
+
+    public func make(from name: String) -> String {
         let articles: Set<String> = ["the", "a", "an"]
         var words = name
             .replacingOccurrences(of: "—", with: " ")
@@ -33,7 +35,7 @@ public enum Initials {
     }
 
     /// Section header. A leading non-letter ("24/7 Pharmacy") is grouped under "#".
-    public static func sectionLetter(name: String) -> String {
+    public func sectionLetter(name: String) -> String {
         let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let character = trimmed.first else { return "#" }
         if character.isLetter {
@@ -54,15 +56,19 @@ public struct StopSection: Equatable, Sendable, Identifiable {
     }
 }
 
-public enum StopGrouping {
-    public static func sections(_ stops: [Stop]) -> [StopSection] {
+public struct StopGrouping: Sendable {
+    private let initials = Initials()
+
+    public init() {}
+
+    public func sections(_ stops: [Stop]) -> [StopSection] {
         let sorted = stops.sorted { lhs, rhs in
             lhs.name.localizedCaseInsensitiveCompare(rhs.name) == .orderedAscending
         }
         var order: [String] = []
         var buckets: [String: [Stop]] = [:]
         for stop in sorted {
-            let letter = Initials.sectionLetter(name: stop.name)
+            let letter = initials.sectionLetter(name: stop.name)
             if buckets[letter] == nil {
                 order.append(letter)
             }

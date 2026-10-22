@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var model = DispatcherModel()
+    @Bindable var model: DispatcherModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -60,5 +60,7 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    let dependencies = AppDependencies()
+    return ContentView(model: dependencies.makeDispatcherModel())
+        .environment(\.cameraCapabilities, dependencies.camera)
 }

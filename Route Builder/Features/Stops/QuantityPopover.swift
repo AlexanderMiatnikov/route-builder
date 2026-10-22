@@ -3,20 +3,21 @@ import RouteBuilderKit
 
 struct QuantityPopover: View {
     let maxPackages: Int?
+    let packageCount: PackageCount
     @State private var value: Int
     let onSave: (Int) -> Void
     let onDismiss: () -> Void
 
-    init(current: Int, maxPackages: Int?, onSave: @escaping (Int) -> Void, onDismiss: @escaping () -> Void) {
+    init(current: Int, maxPackages: Int?, packageCount: PackageCount, onSave: @escaping (Int) -> Void, onDismiss: @escaping () -> Void) {
         self.maxPackages = maxPackages
-        self._value = State(initialValue: PackageCount.clamp(current, max: maxPackages))
+        self.packageCount = packageCount
+        self._value = State(initialValue: packageCount.clamp(current, max: maxPackages))
         self.onSave = onSave
         self.onDismiss = onDismiss
     }
 
     private var upper: Int {
-        if let maxPackages, maxPackages >= 1 { return maxPackages }
-        return PackageCount.fallbackMax
+        packageCount.upperBound(max: maxPackages)
     }
 
     var body: some View {
@@ -27,7 +28,7 @@ struct QuantityPopover: View {
 
             HStack(spacing: 18) {
                 Button {
-                    value = PackageCount.clamp(value - 1, max: maxPackages)
+                    value = packageCount.clamp(value - 1, max: maxPackages)
                 } label: {
                     Image(systemName: "minus")
                         .font(.system(size: 18, weight: .bold))
@@ -42,7 +43,7 @@ struct QuantityPopover: View {
                     .frame(minWidth: 48)
 
                 Button {
-                    value = PackageCount.clamp(value + 1, max: maxPackages)
+                    value = packageCount.clamp(value + 1, max: maxPackages)
                 } label: {
                     Image(systemName: "plus")
                         .font(.system(size: 18, weight: .bold))

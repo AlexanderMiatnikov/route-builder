@@ -10,10 +10,11 @@ struct CameraCapture: UIViewControllerRepresentable {
     let source: Source
     let onImage: (Data?) -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.cameraCapabilities) private var capabilities
 
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
-        let availableCamera = UIImagePickerController.isSourceTypeAvailable(.camera)
+        let availableCamera = capabilities.isSourceAvailable(.camera)
         switch source {
         case .camera where availableCamera:
             picker.sourceType = .camera
@@ -45,7 +46,7 @@ struct CameraCapture: UIViewControllerRepresentable {
             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
         ) {
             let image = (info[.originalImage] as? UIImage)
-            let data = image?.jpegData(compressionQuality: 0.85)
+            let data = image?.jpegData(compressionQuality: parent.capabilities.jpegQuality)
             parent.onImage(data)
             parent.dismiss()
         }

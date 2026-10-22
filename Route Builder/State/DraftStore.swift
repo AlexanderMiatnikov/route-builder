@@ -1,17 +1,20 @@
 import Foundation
 import RouteBuilderKit
 
-struct DraftStore {
+/// Persists the in-progress route. The storage directory and file manager are
+/// injected, so tests can point it at a temporary directory.
+final class DraftStore {
     private let fileURL: URL
+    private let photosURL: URL
+    private let fileManager: FileManager
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
-    init(fileManager: FileManager = .default) {
-        let support = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
-            ?? fileManager.temporaryDirectory
-        let dir = support.appendingPathComponent("RouteBuilder", isDirectory: true)
-        try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
-        self.fileURL = dir.appendingPathComponent("draft.json")
+    init(directory: URL, fileManager: FileManager = .default) {
+        self.fileManager = fileManager
+        try? fileManager.createDirectory(at: directory, withIntermediateDirectories: true)
+        self.fileURL = directory.appendingPathComponent("draft.json")
+        self.photosURL = directory.appendingPathComponent("photos", isDirectory: true)
     }
 
     func load() -> RouteDraft? {
@@ -25,12 +28,11 @@ struct DraftStore {
     }
 
     func clear() {
-        try? FileManager.default.removeItem(at: fileURL)
+        try? fileManager.removeItem(at: fileURL)
     }
 
     var photosDirectory: URL {
-        let dir = fileURL.deletingLastPathComponent().appendingPathComponent("photos", isDirectory: true)
-        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
-        return dir
+        try? fileManager.createDirectory(at: photosURL, withIntermediateDirectories: true)
+        return photosURL
     }
 }
