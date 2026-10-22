@@ -18,7 +18,7 @@
 		A1000004308A1656004DAEA7 /* Exceptions for "Route Builder" folder in "Route Builder" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				Resources/Info.plist,
 			);
 			target = CE28E7A5308A1656004DAEA7 /* Route Builder */;
 		};
@@ -270,7 +270,7 @@
 				DEVELOPMENT_TEAM = J8VM9NVFDC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Route Builder/Info.plist";
+				INFOPLIST_FILE = "Route Builder/Resources/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -304,7 +304,7 @@
 				DEVELOPMENT_TEAM = J8VM9NVFDC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Route Builder/Info.plist";
+				INFOPLIST_FILE = "Route Builder/Resources/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

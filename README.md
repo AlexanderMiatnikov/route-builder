@@ -31,7 +31,7 @@ Health check: `GET http://localhost:4000/health` → `{"ok":true,"requests":N}`.
 | Priority | Source |
 |---|---|
 | 1 | Environment variable `ROUTE_API_BASE_URL` |
-| 2 | Info.plist key `APIBaseURL` in `Route Builder/Info.plist` |
+| 2 | Info.plist key `APIBaseURL` in `Route Builder/Resources/Info.plist` |
 | 3 | Fallback `http://localhost:4000` |
 
 Defaults:
@@ -52,7 +52,13 @@ Covers lenient JSON decoding, paging/dedupe, retries, single-flight submit, and 
 
 ## Project layout
 
-- `Route Builder/` — SwiftUI app (Stops + Instructions)
+- `Route Builder/` — SwiftUI app
+  - `App/` — app entry point and root view
+  - `Features/Stops/`, `Features/Instructions/` — the two screens and their views
+  - `State/` — `DispatcherModel`, `DraftStore`
+  - `Networking/` — `APIConfig`
+  - `Theme/` — colors and styling
+  - `Resources/` — `Assets.xcassets`, `Info.plist`
 - `RouteBuilderKit/` — networking and route rules (unit-tested)
 - `mock/` — unmodified mock server + `API.md`
 - `docs/superpowers/` — design spec and implementation plan
