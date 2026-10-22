@@ -6,13 +6,30 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A1000003308A1656004DAEA7 /* RouteBuilderKit in Frameworks */ = {isa = PBXBuildFile; productRef = A1000002308A1656004DAEA7 /* RouteBuilderKit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CE28E7A6308A1656004DAEA7 /* Route Builder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Route Builder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A1000004308A1656004DAEA7 /* Exceptions for "Route Builder" folder in "Route Builder" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CE28E7A5308A1656004DAEA7 /* Route Builder */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CE28E7A8308A1656004DAEA7 /* Route Builder */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A1000004308A1656004DAEA7 /* Exceptions for "Route Builder" folder in "Route Builder" target */,
+			);
 			path = "Route Builder";
 			sourceTree = "<group>";
 		};
@@ -22,6 +39,7 @@
 		CE28E7A3308A1656004DAEA7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				A1000003308A1656004DAEA7 /* RouteBuilderKit in Frameworks */,
 			);
 		};
 /* End PBXFrameworksBuildPhase section */
@@ -60,6 +78,9 @@
 				CE28E7A8308A1656004DAEA7 /* Route Builder */,
 			);
 			name = "Route Builder";
+			packageProductDependencies = (
+				A1000002308A1656004DAEA7 /* RouteBuilderKit */,
+			);
 			productName = "Route Builder";
 			productReference = CE28E7A6308A1656004DAEA7 /* Route Builder.app */;
 			productType = "com.apple.product-type.application";
@@ -88,6 +109,9 @@
 			);
 			mainGroup = CE28E79D308A1656004DAEA7;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A1000001308A1656004DAEA7 /* XCLocalSwiftPackageReference "RouteBuilderKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE28E7A7308A1656004DAEA7 /* Products */;
 			projectDirPath = "";
@@ -246,11 +270,11 @@
 				DEVELOPMENT_TEAM = J8VM9NVFDC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Route Builder/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -259,12 +283,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "id.Route-Builder";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -278,11 +304,11 @@
 				DEVELOPMENT_TEAM = J8VM9NVFDC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Route Builder/Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -291,12 +317,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "id.Route-Builder";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -320,6 +348,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A1000001308A1656004DAEA7 /* XCLocalSwiftPackageReference "RouteBuilderKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = RouteBuilderKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1000002308A1656004DAEA7 /* RouteBuilderKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = RouteBuilderKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CE28E79E308A1656004DAEA7 /* Project object */;
 	validationLevel = 1;
