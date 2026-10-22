@@ -246,13 +246,17 @@ private struct InstructionCardView: View {
 
             cardBody
                 .offset(x: offsetX)
-                .gesture(
-                    DragGesture()
+                // simultaneousGesture + horizontal-only handling: a plain .gesture(DragGesture())
+                // on the card claims every drag (including vertical ones) and starves the
+                // parent ScrollView, so the feed could not be scrolled by dragging on a card.
+                .simultaneousGesture(
+                    DragGesture(minimumDistance: 20)
                         .onChanged { value in
+                            guard abs(value.translation.width) > abs(value.translation.height) || offsetX > 0 else { return }
                             offsetX = min(150, max(0, value.translation.width))
                         }
                         .onEnded { value in
-                            if value.translation.width > 110 {
+                            if value.translation.width > 110, abs(value.translation.width) > abs(value.translation.height) {
                                 withAnimation { offsetX = 150 }
                                 onRemove()
                                 offsetX = 0
