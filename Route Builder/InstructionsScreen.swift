@@ -285,7 +285,8 @@ private struct InstructionCardView: View {
             .background(.white, in: RoundedRectangle(cornerRadius: 10))
             .overlay(
                 RoundedRectangle(cornerRadius: 10)
-                    .stroke(item.showInstructionError ? Theme.amber : Theme.teal, lineWidth: 1.5)
+                    // Design: the name header stays teal; only the input goes amber.
+                    .stroke(Theme.teal, lineWidth: 1.5)
             )
 
             Text(item.stop.address)

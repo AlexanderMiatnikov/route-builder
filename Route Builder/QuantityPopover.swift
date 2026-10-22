@@ -65,8 +65,9 @@ struct QuantityPopover: View {
             }
         }
         .padding(18)
-        .background(.white, in: RoundedRectangle(cornerRadius: 16))
-        .shadow(color: .black.opacity(0.18), radius: 16, y: 8)
-        .padding(.horizontal, 36)
+        .frame(width: 260)
+        // Presented with `.popover` anchored to the quantity pill; the system
+        // draws the card, arrow and shadow, so no custom chrome here.
+        .presentationCompactAdaptation(.popover)
     }
 }

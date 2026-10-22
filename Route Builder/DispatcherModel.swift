@@ -138,17 +138,23 @@ final class DispatcherModel {
             return
         }
         isSearching = true
+        // Instant, case-insensitive answer from the loaded directory; the API
+        // (case-sensitive) result is merged in after the debounce.
+        searchResults = StopSearch.filter(directory, query: trimmed)
         searchTask = Task {
             try? await Task.sleep(nanoseconds: 280_000_000)
             guard !Task.isCancelled else { return }
+            let server: [Stop]
             do {
-                let items = try await loader.load(pageSize: 50, query: trimmed)
-                guard !Task.isCancelled else { return }
-                searchResults = items
+                server = try await loader.load(pageSize: 50, query: trimmed)
             } catch {
-                guard !Task.isCancelled else { return }
-                searchResults = []
+                server = []
             }
+            guard !Task.isCancelled else { return }
+            searchResults = StopSearch.combine(
+                server: server,
+                local: StopSearch.filter(directory, query: trimmed)
+            )
             isSearching = false
         }
     }

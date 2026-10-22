@@ -24,22 +24,6 @@ struct StopsScreen: View {
             continueButton
         }
         .background(Theme.canvasStops.ignoresSafeArea())
-        .sheet(item: $quantityStop) { stop in
-            QuantityPopover(
-                current: model.packages(for: stop),
-                maxPackages: stop.packagesMax,
-                onSave: { value in
-                    if !model.isSelected(stop) {
-                        model.toggle(stop)
-                    }
-                    model.setPackages(stopID: stop.id, value: value)
-                    quantityStop = nil
-                },
-                onDismiss: { quantityStop = nil }
-            )
-            .presentationDetents([.height(220)])
-            .presentationBackground(.clear)
-        }
         .sheet(isPresented: $showManual) {
             ManualStopSheet { name, address, phone in
                 model.addManualStop(name: name, address: address, phone: phone)
@@ -241,12 +225,6 @@ struct StopsScreen: View {
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.muted)
                         .lineLimit(1)
-                    if selected {
-                        Text(stop.phone)
-                            .font(.system(size: 12))
-                            .foregroundStyle(Theme.muted)
-                            .lineLimit(1)
-                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 if selected {
@@ -258,9 +236,28 @@ struct StopsScreen: View {
                             .foregroundStyle(Theme.teal)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 3)
+                            .background(Color.white, in: Capsule())
                             .overlay(Capsule().stroke(Theme.teal, lineWidth: 1))
+                            .fixedSize()
                     }
                     .buttonStyle(.plain)
+                    // Anchored to the pill itself (not the row/checkbox), arrow
+                    // pointing up at it, card opening below the row.
+                    .popover(
+                        isPresented: quantityBinding(for: stop),
+                        attachmentAnchor: .rect(.bounds),
+                        arrowEdge: .top
+                    ) {
+                        QuantityPopover(
+                            current: model.packages(for: stop),
+                            maxPackages: stop.packagesMax,
+                            onSave: { value in
+                                model.setPackages(stopID: stop.id, value: value)
+                                quantityStop = nil
+                            },
+                            onDismiss: { quantityStop = nil }
+                        )
+                    }
                 } else {
                     Text(stop.phone)
                         .font(.system(size: 13))
@@ -271,12 +268,22 @@ struct StopsScreen: View {
             .padding(.vertical, 10)
             .padding(.leading, 30)
             .padding(.trailing, 14)
-            .background(Color.white)
+            // Mockup "Picker selected": whole row filled #E3F0F1 when checked.
+            .background(selected ? Theme.chipFill : Color.white)
             .overlay(alignment: .bottom) {
                 Rectangle().fill(Theme.line).frame(height: 1)
             }
         }
         .buttonStyle(.plain)
+    }
+
+    private func quantityBinding(for stop: Stop) -> Binding<Bool> {
+        Binding(
+            get: { quantityStop?.id == stop.id },
+            set: { presented in
+                if !presented, quantityStop?.id == stop.id { quantityStop = nil }
+            }
+        )
     }
 
     private func checkbox(selected: Bool) -> some View {
