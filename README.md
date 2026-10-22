@@ -58,6 +58,17 @@ Covers lenient JSON decoding, paging/dedupe, retries, single-flight submit, and 
 - `docs/superpowers/` — design spec and implementation plan
 - `docs/ai/progress.md` — Superpowers SDD ledger copy
 
+## GitHub (private)
+
+Intended remote: private repo named `route-builder`.
+
+```bash
+gh auth login
+gh repo create route-builder --private --source=. --remote=origin --push
+```
+
+If the name is taken: `route-builder-ios`. Then grant the reviewer access.
+
 ## Demo video (deferred)
 
 Record a 60–90s single-take screen recording on a device (or simulator — note that in `DECISIONS.md`): select stops → set quantities → write instructions → swipe-remove one stop → finish. Use QuickTime (device) or Simulator → File → Record Screen.
